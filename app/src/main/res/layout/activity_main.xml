@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activities.MainActivity">
+
+    <Button
+        android:id="@+id/connectionEstbButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="connectionEstablished"
+        android:text="Connection Established" />
+
+    <Button
+        android:id="@+id/disinfectionInProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="disinfectionInProgress"
+        android:text="Disinfection in progress" />
+
+    <Button
+        android:id="@+id/lowRssi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="lowRssi"
+        android:text="low Rssi" />
+
+    <Button
+        android:id="@+id/outOfRange"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="outOfRange"
+        android:text="out of range" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="batteryDrained"
+        android:text="Battery Drained" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="disinfectionComplete"
+        android:text="Disinfection Complete" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="sendDataToBluetooth"
+        android:text="Bluetooth" />
+
+
+</LinearLayout>
