@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Uv Rakshak</string>
+    <string name="splash_screen_description">"Click on the button below to scan and connect to UvRakshak bot close to you"</string>
 </resources>

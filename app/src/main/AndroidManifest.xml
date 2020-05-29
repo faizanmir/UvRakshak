@@ -16,6 +16,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activities.SplashActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <receiver
             android:name=".receivers.NotificationBroadcastReceiver"
@@ -30,17 +37,10 @@
             android:exported="true" />
 
         <activity android:name=".activities.ScanActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".BleBroadcastReceiver"
-            android:enabled="true"
-            android:exported="true" />
+
 
         <activity android:name=".activities.MainActivity">
 
