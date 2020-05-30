@@ -1,57 +1,247 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#dfdfdf"
+    android:id="@+id/rootLayout"
     tools:context=".activities.MainActivity">
 
-    <Button
-        android:id="@+id/connectionEstbButton"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:id="@+id/topBar"
+        android:background="@android:color/white"
+        >
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/back_icon"
+            android:layout_centerVertical="true"
+            android:layout_margin="10dp"
+            android:id="@+id/mainActivityBackButton"
+            />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_toEndOf="@id/mainActivityBackButton"
+            android:layout_centerVertical="true"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Device Name"
+                android:id="@+id/deviceName"
+                android:textSize="20sp"
+                android:textColor="@color/topBarTitleTextColor"
+                />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="5dp"
+                >
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/battery_indicator"
+                    android:id="@+id/batteryIndicator"
+                    android:padding="5dp"
+                    />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/bluetooth_disconnected"
+                    android:id="@+id/bluetoothIndicator"
+                    android:padding="5dp"
+                    />
+
+            </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Status"
+                android:id="@+id/deviceStatus"
+                />
+        </LinearLayout>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/disconnect_button"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="20dp"
+            android:id="@+id/connectionButton"
+            />
+
+    </RelativeLayout>
+
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="connectionEstablished"
-        android:text="Connection Established" />
+        android:id="@+id/uvPanel"
+        android:orientation="horizontal"
+        android:layout_below="@+id/topBar"
+        android:padding="10dp"
+        android:layout_margin="10dp"
+        >
+        <androidx.cardview.widget.CardView
+            android:layout_width="150dp"
+            android:layout_height="60dp"
+            app:cardCornerRadius="30dp"
 
-    <Button
-        android:id="@+id/disinfectionInProgress"
-        android:layout_width="match_parent"
+            >
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity ="center_vertical|end"
+                android:layout_margin="10dp"
+                android:id="@+id/uvSwitch"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="UV"
+                android:textSize="20sp"
+                android:textColor="@android:color/black"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="30dp"
+                />
+
+
+
+        </androidx.cardview.widget.CardView>
+        <View
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+
+            />
+        <androidx.cardview.widget.CardView
+            android:layout_width="190dp"
+            android:layout_height="60dp"
+            app:cardCornerRadius="30dp"
+            >
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Manual"
+                    android:textSize="20sp"
+                    android:textColor="@android:color/black"
+                    android:layout_gravity="center_vertical|start"
+                    />
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity ="center"
+                android:id="@+id/autoToggle"
+                android:layout_margin="5dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Auto"
+                android:textSize="20sp"
+                android:textColor="@android:color/black"
+                android:layout_gravity="center_vertical"
+                />
+            </LinearLayout>
+
+
+
+
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+
+
+
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        app:cardCornerRadius="120dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="50dp"
+        android:elevation="10dp"
+        android:id="@+id/buttonHolder"
+        >
+
+        <ImageView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="disinfectionInProgress"
-        android:text="Disinfection in progress" />
-
-    <Button
-        android:id="@+id/lowRssi"
+        android:src="@drawable/fwd_button"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="20dp"
+        android:id="@+id/forwardButton"
+        />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/back_button"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_margin="20dp"
+            android:id="@+id/backButton"
+            />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/left_button"
+            android:layout_gravity="center_vertical|start"
+            android:layout_margin="20dp"
+            android:id="@+id/leftButton"
+            />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/rightButton"
+            android:layout_margin="20dp"
+            android:src="@drawable/right_button"
+            android:layout_gravity="center_vertical|end"
+            />
+    </androidx.cardview.widget.CardView>
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="lowRssi"
-        android:text="low Rssi" />
+        android:layout_height="50dp"
+        app:cardCornerRadius="25dp"
+        android:layout_below="@id/uvPanel"
+        android:layout_margin="10dp"
+        android:padding="0dp"
+        >
+        <ProgressBar
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:scaleY="15"
+            android:id="@+id/timeProgressbar"
+            android:visibility="gone"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="TIME LEFT"
+            android:textColor="@android:color/black"
+            android:id="@+id/timeTextView"
+            />
 
-    <Button
-        android:id="@+id/outOfRange"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="outOfRange"
-        android:text="out of range" />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="batteryDrained"
-        android:text="Battery Drained" />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="disinfectionComplete"
-        android:text="Disinfection Complete" />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="sendDataToBluetooth"
-        android:text="Bluetooth" />
+    </androidx.cardview.widget.CardView>
 
 
-</LinearLayout>
+
+
+
+
+</RelativeLayout>

@@ -57,6 +57,7 @@ class BluetoothHelper(var context: Context) :BluetoothGattCallback() {
 
     interface BluetoothCallbacks{
         fun broadcastUpdate(action:String)
+        fun onBluetoothStateChange(newState:Int)
     }
 
 
@@ -110,8 +111,9 @@ class BluetoothHelper(var context: Context) :BluetoothGattCallback() {
 
 
         } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-
+            mListener?.broadcastUpdate(Constants.DEVICE_DISCONNECTED)
         }
+        mListener?.onBluetoothStateChange(newState)
     }
 
 
@@ -180,11 +182,12 @@ class BluetoothHelper(var context: Context) :BluetoothGattCallback() {
 
     fun onDone() {
         Log.i("TAG","OnDone")
+        bluetoothGatt?.disconnect()
     }
 
     fun startAutoMode() {
         Log.i("TAG","startAutoMode")
-        mListener?.broadcastUpdate(DISINFECTION_IN_PROGRESS)
+        write("*amode")
     }
 
     fun shutdownService() {
@@ -193,6 +196,8 @@ class BluetoothHelper(var context: Context) :BluetoothGattCallback() {
 
     fun disconnect() {
         Log.i("TAG","disconnect")
+        bluetoothGatt?.disconnect()
+        bluetoothGatt  = null
     }
 
     fun onDeviceOutOfRange() {
@@ -200,7 +205,7 @@ class BluetoothHelper(var context: Context) :BluetoothGattCallback() {
     }
 
     fun onAutoModeChosen() {
-        Log.i("TAG","on Auto mode chosen")
+        write("*amode")
     }
 
     fun onDisinfectionProcessStarted() {
@@ -209,6 +214,7 @@ class BluetoothHelper(var context: Context) :BluetoothGattCallback() {
 
     fun onDisinfectionComplete() {
         Log.i("TAG","on disinfection complete")
+        write("*uvoff")
     }
 
     fun onBatteryLow() {
@@ -221,10 +227,17 @@ class BluetoothHelper(var context: Context) :BluetoothGattCallback() {
 
     fun onDisconnectionInProgress() {
         Log.i("TAG","on disinfection progress")
+        write("*uvon")
     }
 
     fun stopDisinfection() {
+        write("*uvoff")
         Log.i("TAG","stop disinfection")
+    }
+
+
+    fun startManualMode(){
+        write("*mmode")
     }
 
 

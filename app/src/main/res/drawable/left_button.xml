@@ -10,19 +10,9 @@
       android:fillType="evenOdd"
       android:strokeColor="#00000000"/>
   <path
-      android:pathData="M42.8455,47.3132l-11.666,-11.3137l11.666,-11.3127l-0.707,-0.6868l-12.374,11.9995l12.374,11.9995z"
-      android:strokeWidth="4"
-      android:fillColor="#303030"
-      android:strokeColor="#FFFFFF"
-      android:fillType="evenOdd"/>
-  <group>
-    <clip-path
-        android:pathData="M29.7646,24.6868l11.666,11.3137l-11.666,11.3127l0.707,0.6868l12.374,-11.9995l-12.374,-11.9995z"/>
-    <path
-        android:pathData="M20.7645,52l0,-32l32,-0l0,32z"
-        android:strokeWidth="1"
-        android:fillColor="#FFFFFF"
-        android:fillType="evenOdd"
-        android:strokeColor="#00000000"/>
-  </group>
+      android:pathData="M42.1388,50.787l3.5798,-3.4719l-11.6648,-11.3142l11.6638,-11.3111l-3.5778,-3.4749l-15.248,14.7865z"
+      android:strokeWidth="1"
+      android:fillColor="#FFFFFF"
+      android:fillType="nonZero"
+      android:strokeColor="#00000000"/>
 </vector>

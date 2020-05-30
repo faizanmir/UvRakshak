@@ -26,11 +26,13 @@ class ScanActivity : AppCompatActivity(), BluetoothListAdapter.OnDeviceSelectedL
     var bluetoothAdapter: BluetoothAdapter? = null
     lateinit var handler:Handler
     lateinit var adapter: BluetoothListAdapter
+    var selectedDevice :BluetoothDevice? =  null
+
 
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scan)
-        init()
+
 
         scanCallback = object :ScanCallback(){
            override fun onScanFailed(errorCode: Int) {
@@ -42,8 +44,10 @@ class ScanActivity : AppCompatActivity(), BluetoothListAdapter.OnDeviceSelectedL
 
                if(result?.device?.name!=null && !scanResult.contains(result.device)) {
                    scanResult.add(result.device)
-                   adapter.notifyDataSetChanged()
+                   adapter.listListener(scanResult)
+                   scanProgressBar.visibility  = View.INVISIBLE
                }
+
 
            }
 
@@ -52,9 +56,14 @@ class ScanActivity : AppCompatActivity(), BluetoothListAdapter.OnDeviceSelectedL
            }
        }
 
-        startScan.setOnClickListener{
+        init()
+
+        rescan.setOnClickListener{
+            scanProgressBar.visibility = View.VISIBLE
+
             scanResult.clear()
             adapter.notifyDataSetChanged()
+
             if(!isScanning) {
 
                 bluetoothScanner?.startScan(scanCallback)
@@ -63,7 +72,7 @@ class ScanActivity : AppCompatActivity(), BluetoothListAdapter.OnDeviceSelectedL
                 handler.postDelayed({ bluetoothScanner?.stopScan(scanCallback)
 
                 scanProgressBar.visibility = View.INVISIBLE
-                }, 5000)
+                }, 1000)
                 scanProgressBar.visibility = View.VISIBLE
             }
             else
@@ -71,22 +80,26 @@ class ScanActivity : AppCompatActivity(), BluetoothListAdapter.OnDeviceSelectedL
                 bluetoothScanner?.stopScan(scanCallback)
                 isScanning = false
                 bluetoothScanner?.startScan(scanCallback)
+
             }
         }
 
-        stopScan.setOnClickListener{
-            isScanning = false
-            bluetoothScanner?.stopScan(scanCallback)
-            scanProgressBar.visibility = View.INVISIBLE
+        back_button.setOnClickListener {
+            finish()
         }
+
+//        stopScan.setOnClickListener{
+//            isScanning = false
+//            bluetoothScanner?.stopScan(scanCallback)
+//            scanProgressBar.visibility = View.INVISIBLE
+//        }
     }
 
     override fun onDeviceSelected(bluetoothDevice: BluetoothDevice?) {
         bluetoothScanner?.stopScan(scanCallback)
-        val intent = Intent(this, MainActivity::class.java).also {
-            it.putExtra(Constants.DEVICE_NAME,bluetoothDevice?.address)
-        }
-        startActivity(intent)
+        selectedDevice  =  bluetoothDevice
+
+
     }
 
     private fun init()
@@ -102,7 +115,18 @@ class ScanActivity : AppCompatActivity(), BluetoothListAdapter.OnDeviceSelectedL
             bluetoothScanner = bluetoothAdapter?.bluetoothLeScanner
         }
 
-        scanProgressBar.visibility = View.INVISIBLE
+
+        bluetoothScanner?.startScan(scanCallback)
+        isScanning  = true
+
+
+        handler.postDelayed({if (isScanning){
+            bluetoothScanner?.stopScan(scanCallback)
+            scanProgressBar.visibility = View.INVISIBLE
+            isScanning  = false
+        } },1000)
+
+        scanProgressBar.visibility = View.VISIBLE
 
     }
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -127,6 +151,21 @@ class ScanActivity : AppCompatActivity(), BluetoothListAdapter.OnDeviceSelectedL
 
     override fun onBackPressed() {
         finish()
+    }
+
+    fun connectToSelectedDevice(view: View) {
+        if (selectedDevice  !=  null) {
+
+            val intent = Intent(this, MainActivity::class.java).also {
+                it.putExtra(Constants.DEVICE_NAME, selectedDevice?.name)
+                it.putExtra(Constants.DEVICE_ADDRESS ,selectedDevice?.address  )
+            }
+            startActivity(intent)
+        }else{
+            Toast.makeText(this,"Please select a Uv Rakshak from the list to continue",Toast.LENGTH_LONG).show()
+        }
+
+
     }
 
 

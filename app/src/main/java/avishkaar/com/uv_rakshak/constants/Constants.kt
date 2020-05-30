@@ -3,6 +3,7 @@ package avishkaar.com.uv_rakshak.constants
 class Constants {
     companion object{
 
+        const val DEVICE_DISCONNECTED: String = "avishkaar.com.uv_rakshak.DEVICE_DISCONNECTED"
         const val ACTION_GATT_CONNECTED = "avishkaar.com.uv_rakshak.ACTION_GATT_CONNECTED"
         const val ACTION_GATT_DISCONNECTED = "avishkaar.com.uv_rakshak.ACTION_GATT_DISCONNECTED"
         const val ACTION_GATT_SERVICES_DISCOVERED ="avishkaar.com.uv_rakshak.ACTION_GATT_SERVICES_DISCOVERED"
@@ -11,6 +12,7 @@ class Constants {
         const val SEND_DATA = "avishkaar.com.uv_rakshak.EXTRA_DATA"
         const val TEST_DATA = "TEST_DATA"
         const val DEVICE_NAME  =  "device_name"
+        const val DEVICE_ADDRESS =  "device_address"
         const val ON_CHARACTERISTICS_CHANGED  =  "avishkaar.com.uv_rakshak.ON_CHARACTERISTICS_CHANGED"
         const val ON_SERVICES_DISCOVERED  = "avishkaar.com.uv_rakshak.ON_SERVICES_DISCOVERED"
         const val ON_CHARACTERISTICS_WRITE = "avishkaar.com.uv_rakshak.ON_CHARACTERISTICS_WRITE"
@@ -25,6 +27,10 @@ class Constants {
         const val STOP_DISINFECTION  = "avishkaar.com.uv_rakshak.STOP_DISINFECTION"
         const val ON_DONE  = "avishkaar.com.uv_rakshak.DONE"
         const val SWITCH_TO_AUTO  =  "avishkaar.com.uv_rakshak.SWITCH_TO_AUTO"
+        const val MINUTES  =  15.0
+        const val ACTIVITY_ID  =  "avishkaar.com.uv_rakhshak_mainActivity"
+        const val SERVICE_ID = "avishkaar.com.uv_rakhshak_bleService"
+        const val SWITCH_TO_MANUAL_MODE  =  "avishkaar.com.uv_rakshak.SWITCH_TO_MANUAL_MODE"
     }
 
 

@@ -8,24 +8,17 @@ import avishkaar.com.uv_rakshak.constants.Constants
 
 class NotificationBroadcastReceiver : BroadcastReceiver() {
 
+    /**
+    This class is  the actual broadcast receiver and receives broadcasts from the service as well as from the notifications
+    **/
     interface NotificationChangeListener
     {
-        fun changeNotificationAndPerformAction(action:String)
+        fun changeNotificationAndPerformAction(action:String,className:String)
     }
 
     companion object{
-        var instance : NotificationBroadcastReceiver?  =  null
         var mListener:NotificationChangeListener? =  null
        // var listenerMap = hashMapOf<Context,NotificationChangeListener?>()
-
-        fun getReceiverInstance(): NotificationBroadcastReceiver?{
-            return if(instance ==  null) {
-                NotificationBroadcastReceiver()
-            }else{
-                instance
-            }
-        }
-
 
         fun makeIntentFilter():IntentFilter{
             return IntentFilter().apply {
@@ -45,7 +38,7 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
        //notifyAllReceivers(intent.action)
-        mListener?.changeNotificationAndPerformAction(intent.action!!)
+        mListener?.changeNotificationAndPerformAction(intent.action!!,context::class.java.name)
     }
 
 
@@ -63,8 +56,4 @@ class NotificationBroadcastReceiver : BroadcastReceiver() {
     }
 
 
-    private fun notifyAllReceivers(action: String?){
-        mListener?.changeNotificationAndPerformAction(action!!)
-
-    }
 }

@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">Uv Rakshak</string>
     <string name="splash_screen_description">"Click on the button below to scan and connect to UvRakshak bot close to you"</string>
+    <string name="connect_to_uv_rakshak">Connect to UV Rakshak</string>
+    <string name="select_a_bot_from_the_list_below">Select a bot from the list below</string>
+    <string name="disinfection_complete">Disinfection complete</string>
+    <string name="timer_will_begin">Timer will begin once you turn on Auto Mode</string>
+    <string name="uv_switch_on_warning">UV -C rays can be harmful if exposed to skin.Please make sure  the robot is in an enclosed  space and there are no humans present,before turning on the light</string>
+    <string name="battery_drained">Looks like the battery has drained on your bot.Connect to a power source to recharge and resume disinfection</string>
+    <string name="auto_mode">
+        In Auto mode, the bot will continue to disinfect based on the time at the timer
+        \n\n\nThe motion sensors will be turned on and the bot will automatically shutdown if it detects human presence
+        \n\n\nIn AUTO mode you will not be able to move the bot around </string>
 </resources>
