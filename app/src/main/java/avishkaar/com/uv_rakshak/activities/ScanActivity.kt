@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
-import android.bluetooth.le.ScanResult
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -16,86 +15,31 @@ import androidx.recyclerview.widget.RecyclerView
 import avishkaar.com.uv_rakshak.R
 import avishkaar.com.uv_rakshak.adapters.BluetoothListAdapter
 import avishkaar.com.uv_rakshak.constants.Constants
+import avishkaar.com.uv_rakshak.services.BleService
+import avishkaar.com.uv_rakshak.singletons.Singleton
+import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService
+import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus
 import kotlinx.android.synthetic.main.activity_scan.*
 
-class ScanActivity : AppCompatActivity(), BluetoothListAdapter.OnDeviceSelectedListener {
-    var isScanning =  false
+class ScanActivity : AppCompatActivity(), BluetoothListAdapter.OnDeviceSelectedListener
+    ,BluetoothService.OnBluetoothScanCallback,BluetoothService.OnBluetoothEventCallback{
     var scanResult = ArrayList<BluetoothDevice?> ()
-     var scanCallback:ScanCallback? = null
     var bluetoothScanner: BluetoothLeScanner? = null
     var bluetoothAdapter: BluetoothAdapter? = null
     lateinit var handler:Handler
     lateinit var adapter: BluetoothListAdapter
     var selectedDevice :BluetoothDevice? =  null
+    var service:BluetoothService ? =  null
 
 
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scan)
-
-
-        scanCallback = object :ScanCallback(){
-           override fun onScanFailed(errorCode: Int) {
-               scanProgressBar.visibility = View.INVISIBLE
-               Toast.makeText(this@ScanActivity,"Scan Failed",Toast.LENGTH_SHORT).show()
-           }
-
-           override fun onScanResult(callbackType: Int, result: ScanResult?) {
-
-               if(result?.device?.name!=null && !scanResult.contains(result.device)) {
-                   scanResult.add(result.device)
-                   adapter.listListener(scanResult)
-                   scanProgressBar.visibility  = View.INVISIBLE
-               }
-
-
-           }
-
-           override fun onBatchScanResults(results: MutableList<ScanResult>?) {
-
-           }
-       }
-
         init()
 
-        rescan.setOnClickListener{
-            scanProgressBar.visibility = View.VISIBLE
-
-            scanResult.clear()
-            adapter.notifyDataSetChanged()
-
-            if(!isScanning) {
-                bluetoothScanner?.startScan(scanCallback)
-                isScanning = true
-                scanProgressBar.visibility = View.VISIBLE
-                handler.postDelayed({
-                    bluetoothScanner?.stopScan(scanCallback)
-                    scanProgressBar.visibility = View.INVISIBLE
-                }, 3000)
-
-            }
-            else
-            {
-                bluetoothScanner?.stopScan(scanCallback)
-                isScanning = false
-                bluetoothScanner?.startScan(scanCallback)
-
-            }
-        }
-
-        back_button.setOnClickListener {
-            finish()
-        }
-
-//        stopScan.setOnClickListener{
-//            isScanning = false
-//            bluetoothScanner?.stopScan(scanCallback)
-//            scanProgressBar.visibility = View.INVISIBLE
-//        }
     }
 
     override fun onDeviceSelected(bluetoothDevice: BluetoothDevice?) {
-        bluetoothScanner?.stopScan(scanCallback)
         selectedDevice  =  bluetoothDevice
 
 
@@ -103,29 +47,39 @@ class ScanActivity : AppCompatActivity(), BluetoothListAdapter.OnDeviceSelectedL
 
     private fun init()
     {
+
+        service  = BleService.Companion.BluetoothInitializerClass.service
+        service?.setOnScanCallback(this)
+        service?.setOnEventCallback(this)
+        service?.startScan()
         adapter = BluetoothListAdapter(scanResult,this)
+
         bluetoothRecyclerView.adapter = adapter
         bluetoothRecyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
 
         handler = Handler()
+
+        handler.postDelayed({ service?.stopScan() },5000)
+
 
         if(BluetoothAdapter.getDefaultAdapter() != null) {
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
             bluetoothScanner = bluetoothAdapter?.bluetoothLeScanner
         }
 
+        rescan.setOnClickListener{
+            if(service?.status  == BluetoothStatus.CONNECTED) {
+                service?.disconnect()
+            }
+            service?.startScan()
+        }
 
-        bluetoothScanner?.startScan(scanCallback)
-        isScanning  = true
+        back_button.setOnClickListener {
+            service?.stopScan()
+            finish()
+        }
 
 
-        handler.postDelayed({if (isScanning){
-            bluetoothScanner?.stopScan(scanCallback)
-            scanProgressBar.visibility = View.INVISIBLE
-            isScanning  = false
-        } },3000)
-
-        scanProgressBar.visibility = View.VISIBLE
 
     }
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -153,11 +107,14 @@ class ScanActivity : AppCompatActivity(), BluetoothListAdapter.OnDeviceSelectedL
     }
 
     fun connectToSelectedDevice(view: View) {
+        service?.stopScan()
         if (selectedDevice  !=  null) {
-
+            BleService.Companion.BluetoothInitializerClass.device  =  selectedDevice
+            service?.disconnect()
+            service?.connect(selectedDevice)
             val intent = Intent(this, MainActivity::class.java).also {
                 it.putExtra(Constants.DEVICE_NAME, selectedDevice?.name)
-                it.putExtra(Constants.DEVICE_ADDRESS ,selectedDevice?.address  )
+               // it.putExtra(Constants.DEVICE_ADDRESS ,selectedDevice?.address  )
             }
             startActivity(intent)
         }else{
@@ -165,6 +122,48 @@ class ScanActivity : AppCompatActivity(), BluetoothListAdapter.OnDeviceSelectedL
         }
 
 
+    }
+
+    override fun onStopScan() {
+        scanProgressBar.visibility = View.INVISIBLE
+    }
+
+    override fun onStartScan() {
+        scanProgressBar.visibility = View.VISIBLE
+    }
+
+    override fun onDeviceDiscovered(device: BluetoothDevice?, rssi: Int) {
+        if(device?.name!=null && !scanResult.contains(device)) {
+            scanResult.add(device)
+            adapter.listListener(scanResult)
+            scanProgressBar.visibility  = View.INVISIBLE
+        }
+    }
+
+    override fun onDataRead(buffer: ByteArray?, length: Int) {
+
+    }
+
+    override fun onStatusChange(status: BluetoothStatus?) {
+    }
+
+    override fun onDataWrite(buffer: ByteArray?) {
+
+    }
+
+    override fun onToast(message: String?) {
+
+    }
+
+    override fun onDeviceName(deviceName: String?) {
+
+    }
+
+
+    override fun onPause() {
+        super.onPause()
+        service?.setOnEventCallback(null)
+        service?.setOnEventCallback(null)
     }
 
 

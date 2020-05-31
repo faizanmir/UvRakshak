@@ -18,14 +18,12 @@ class CountdownCounter(var millisInFuture: Long, var countDownInterval: Long) :C
 
     fun registerOnTimerStartedListener(id:String,onTimerStartedListener: OnTimerStartedListener){
         listenerMap[id] =  onTimerStartedListener
-        Log.e("ListenerMap",listenerMap.toString())
     }
 
     fun unregisterOnTimerStartedListener(id: String)
     {
         listenerMap[id] =  null
 
-        Log.e("ListenerMap",listenerMap.toString())
     }
 
 

@@ -93,11 +93,11 @@ class NotificationHelper(var context: Context) :
         val notificationBuilder = NotificationCompat.Builder(context, BleService.CHANNEL_ID)
 
 
-//        val activityIntent = Intent(context, MainActivity::class.java).apply {
-//            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//
-//        }
-//        val activityPendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, activityIntent, 0)
+        val activityIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+        }
+        val activityPendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, activityIntent, 0)
 
 
 
@@ -202,7 +202,7 @@ class NotificationHelper(var context: Context) :
             setContentTitle(title)
             setContentText(contentText)
             priority = NotificationCompat.PRIORITY_DEFAULT
-            //setContentIntent(activityPendingIntent)
+            setContentIntent(activityPendingIntent)
             color = context.resources.getColor(android.R.color.holo_blue_bright,null)
             setSmallIcon(R.drawable.ic_android_black_24dp)
 

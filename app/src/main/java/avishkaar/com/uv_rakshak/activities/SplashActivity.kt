@@ -11,6 +11,9 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import avishkaar.com.uv_rakshak.R
+import avishkaar.com.uv_rakshak.services.BleService
+import avishkaar.com.uv_rakshak.singletons.Singleton
+import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus
 import pub.devrel.easypermissions.EasyPermissions
 
 
@@ -32,6 +35,17 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
+
+
+
+
+        if(BleService.Companion.BluetoothInitializerClass.service?.status  == BluetoothStatus.CONNECTED)
+        {
+            startActivity(Intent(this,MainActivity::class.java))
+        }else
+        {
+            BleService.Companion.BluetoothInitializerClass(applicationContext).setService()
+        }
     }
 
     fun proceedToScan(view: View) {

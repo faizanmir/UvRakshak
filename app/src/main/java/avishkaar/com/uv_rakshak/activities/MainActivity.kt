@@ -3,6 +3,7 @@ package avishkaar.com.uv_rakshak.activities
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
@@ -13,14 +14,14 @@ import android.widget.CompoundButton
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import avishkaar.com.uv_rakshak.modelClasses.ActivityStateManagement
-import avishkaar.com.uv_rakshak.helpers.BluetoothState
+import avishkaar.com.uv_rakshak.modelClasses.ActivityStateClass
 import avishkaar.com.uv_rakshak.R
 import avishkaar.com.uv_rakshak.constants.Constants
-import avishkaar.com.uv_rakshak.helpers.BluetoothHelper.Companion.bluetoothGatt
 import avishkaar.com.uv_rakshak.helpers.CountdownCounter
 import avishkaar.com.uv_rakshak.services.BleService
 import avishkaar.com.uv_rakshak.singletons.Singleton
+import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService
+import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.concurrent.TimeUnit
 
@@ -30,35 +31,26 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
     CompoundButton.OnCheckedChangeListener,
     View.OnTouchListener, View.OnClickListener,
     BleService.ServiceActionListener {
-    var bleService: BleService? = null
-    var deviceAddress: String? = ""
-    var countdownCounter: CountdownCounter? = null
-    var isCountdownRunning: Boolean = false
-    var isUvOn = false
-    var batteryDialog: AlertDialog? = null
-    var uvDialog: AlertDialog? = null
-    var lowRssi: AlertDialog? = null
-    var autoModeActive = false
-    var isDisinfectionInProgress = false
-    var autoModeDialog: AlertDialog? = null
-    var activityStateManagement: ActivityStateManagement? = null
-    var device_name_string: String? = null
-    var connectionState: BluetoothState = BluetoothState.isDisconnected
-    var isTimerOn = false
-    var temp: ActivityStateManagement? = null
-
-
-    var isDeviceConnected =  false;
+    private var bleService: BleService? = null
+    private var countdownCounter: CountdownCounter? = null
+    private var isCountdownRunning: Boolean = false
+    private var isUvOn = false
+    private var batteryDialog: AlertDialog? = null
+    private var uvDialog: AlertDialog? = null
+    private var lowRssi: AlertDialog? = null
+    private var autoModeActive = false
+    private var isDisinfectionInProgress = false
+    private var autoModeDialog: AlertDialog? = null
+    private var service :BluetoothService?  =  null
+    private var millis  :Long = 0
+    private var isDeviceConnected =  false
 
 
     companion object {
         var ACTIVITY_IS_RUNNING = false
     }
 
-    override fun onStart() {
-        super.onStart()
 
-    }
 
     @RequiresApi(Build.VERSION_CODES.O)
 
@@ -66,6 +58,9 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initialize()
+        makeDialogs()
+        setGestureListeners()
+        checkForPreviousState()
 
 
     }
@@ -77,12 +72,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         bleService =  (service as BleService.LocalBinder).getService()
-        if(bluetoothGatt  == null) {
-            Log.e("GATT is null", "null")
-            bleService?.connectToDevice(address = deviceAddress)
-            bleService?.setServiceActionListener(this)
-
-        }
+        bleService?.setServiceActionListener(this)
     }
 
 
@@ -109,10 +99,18 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
 
     override fun onResume() {
         super.onResume()
+
+        if(service?.status ==  BluetoothStatus.CONNECTED)
+        {
+            setUiForConnected()
+        }
+
         ACTIVITY_IS_RUNNING = true
         startService()
+        Log.e("TAG","Registering service listener")
         bleService?.setServiceActionListener(this)
         countdownCounter?.registerOnTimerStartedListener(Constants.ACTIVITY_ID, this)
+        setActivityState(isUvOn,autoModeActive)
 
 
     }
@@ -123,6 +121,9 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
         if (bleService != null) {
             unbindService(this)
         }
+
+        setActivityState(isUvOn,autoModeActive)
+
         if (countdownCounter != null) {
             countdownCounter?.unregisterOnTimerStartedListener(Constants.ACTIVITY_ID)
         }
@@ -135,53 +136,22 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
 
 
    private fun initialize() {
-       //  bleService?.getActivityStateManagementObject()
+        service  = BleService.Companion.BluetoothInitializerClass.service
+        countdownCounter = Singleton.countdownCounter
 
-       countdownCounter = Singleton.countdownCounter
-
-       makeDialogs()
-
-       rootLayout.setBackgroundResource(R.drawable.gradient)
-
-       if(!isDeviceConnected) {
-           overlay.visibility = View.VISIBLE
+       if(service?.status  ==  BluetoothStatus.CONNECTED)
+       {
+          setUiForConnected()
+           rootLayout.setBackgroundResource(R.drawable.gradient)
        }
-
-
-
-       leftButton.setOnTouchListener(this)
-       rightButton.setOnTouchListener(this)
-       forwardButton.setOnTouchListener(this)
-       backButton.setOnTouchListener(this)
-       uvSwitch.setOnCheckedChangeListener(this)
-       autoToggle.setOnCheckedChangeListener(this)
-       mainActivityBackButton.setOnClickListener(this)
-       connectionButton.setOnClickListener (this)
-       setUiForManualMode()
-
-
-       deviceAddress = intent.getStringExtra(Constants.DEVICE_ADDRESS)
-       device_name_string = intent.getStringExtra(Constants.DEVICE_NAME)
-       deviceName.text = device_name_string
-
-
-       //restoreState()
-
+       deviceName.text  = BleService.Companion.BluetoothInitializerClass.device?.name
 
    }
 
 
     override fun onTick(millisInFuture: Long) {
-
-        timeTextView?.text = String.format(
-            "%02d:%02d  Minutes Left",
-            TimeUnit.MILLISECONDS.toMinutes(millisInFuture).toInt(),
-            TimeUnit.MILLISECONDS.toSeconds(millisInFuture) -
-                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millisInFuture))
-        )
-        setCountdownProgress(
-            TimeUnit.MILLISECONDS.toMinutes(millisInFuture).toDouble() / Constants.MINUTES * 100
-        )
+        millis   = millisInFuture
+        setTimerProgress(millisInFuture)
     }
 
     override fun onFinish() {
@@ -230,7 +200,9 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
             R.id.autoToggle -> {
                 when (isChecked) {
                     true -> {
-                        if (!autoModeDialog?.isShowing!!) {
+                        autoModeActive  =  true
+                        if (
+                            !autoModeDialog?.isShowing!!) {
                             autoModeDialog?.show()
                         }
 
@@ -254,16 +226,16 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
         if (event?.action == MotionEvent.ACTION_DOWN) {
             when (v?.id) {
                 R.id.forwardButton -> {
-                    bleService?.write("*f")
+                  v.performClick()
                 }
                 R.id.leftButton -> {
-                    bleService?.write("*l")
+                    v.performClick()
                 }
                 R.id.rightButton -> {
-                    bleService?.write("*r")
+                    v.performClick()
                 }
                 R.id.backButton -> {
-                    bleService?.write("*b")
+                   v.performClick()
                 }
 
 
@@ -275,7 +247,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
     }
 
     override fun onDone() {
-
+        finish()
     }
 
     override fun startAutoMode() {
@@ -302,7 +274,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
     }
 
     override fun onDisinfectionComplete() {
-        //Stub
+        setUiForManualMode()
     }
 
     override fun onBatteryLow() {
@@ -351,6 +323,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
             bluetoothIndicator.setImageResource(R.drawable.bluetooth_indicator)
             deviceStatus.text  =  "Device connected"
             overlay.visibility =  View.INVISIBLE
+            rootLayout.setBackgroundResource(R.drawable.gradient)
         }
 
     }
@@ -361,8 +334,28 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
             bluetoothIndicator.setImageResource(R.drawable.bluetooth_disconnected)
             deviceStatus.text = "Device disconnected"
             overlay.visibility =  View.INVISIBLE
+            rootLayout.setBackgroundColor(Color.parseColor("#dfdfdf"))
         }
 
+    }
+
+
+
+
+
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) hideSystemUI()
+    }
+
+    private fun hideSystemUI() {
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_FULLSCREEN)
     }
 
 
@@ -446,53 +439,104 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
             R.id.connectionButton->{
                 if(isDeviceConnected)
                 {
-                    bleService?.disconnectBluetooth()
+                    service?.disconnect()
+                  //  bleService?.setActivityStateManagementVariables(null)
                 }else{
-                    bleService?.connectToDevice(deviceAddress)
+                    overlay.visibility = View.VISIBLE
+//                   if(service?.status == BluetoothStatus.CONNECTED) {
+//                       bleService?.disconnect()
+//                   }
+
+                    bleService?.connect(BleService.Companion.BluetoothInitializerClass.device)
                 }
+            }
+            R.id.forwardButton -> {
+                bleService?.write("*f")
+            }
+            R.id.leftButton -> {
+                bleService?.write("*l")
+            }
+            R.id.rightButton -> {
+                bleService?.write("*r")
+            }
+            R.id.backButton -> {
+                bleService?.write("*b")
             }
         }
     }
 
 
-    override fun onStop() {
-        super.onStop()
 
-
+    fun setActivityState(isUvOn:Boolean,isAutoOn:Boolean){
+        bleService?.setActivityStateManagementVariables(ActivityStateClass(isUvOn,isAutoOn,millis))
     }
 
 
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) hideSystemUI()
-    }
 
-    private fun hideSystemUI() {
-        // Enables regular immersive mode.
-        // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
-        // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
-                // Set the content to appear under the system bars so that the
-                // content doesn't resize when the system bars hide and show.
-                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                // Hide the nav bar and status bar
-                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_FULLSCREEN)
+    fun setUiForConnected(){
+        Log.e("TAG","Device already connected")
+        isDeviceConnected  =  true
+        overlay.visibility  = View.GONE
+        bluetoothIndicator.setImageResource(R.drawable.bluetooth_indicator)
+        deviceStatus.text  =  "Device Connected"
+        connectionButton.setImageResource(R.drawable.connected_button)
     }
 
 
-//    private fun restoreState(){
-//        Log.e("RESTOR",BleService.stateManagementObject.toString())
-//        if( BleService.stateManagementObject != null )
-//        {
-//            deviceName.text = BleService.stateManagementObject?.deviceName
-//            if(BleService.stateManagementObject?.isUvOn!! ){uvSwitch.isChecked  =  true}
-//            connectionState = BleService.stateManagementObject!!.connectionState!!
-//            if(BleService.stateManagementObject!!.isAutoModeOn!!) {autoToggle.isChecked =  true}
-//        }
-//    }
+    fun setTimerProgress(millis:Long){
+        timeTextView?.text = String.format(
+            "%02d:%02d  Minutes Left",
+            TimeUnit.MILLISECONDS.toMinutes(millis).toInt(),
+            TimeUnit.MILLISECONDS.toSeconds(millis) -
+                    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis))
+        )
+        setCountdownProgress(TimeUnit.MILLISECONDS.toMinutes(millis).toDouble() / Constants.MINUTES * 100)
+    }
 
 
+
+    fun setGestureListeners()
+    {
+
+        leftButton.setOnTouchListener(this)
+        rightButton.setOnTouchListener(this)
+        forwardButton.setOnTouchListener(this)
+        backButton.setOnTouchListener(this)
+        uvSwitch.setOnCheckedChangeListener(this)
+        autoToggle.setOnCheckedChangeListener(this)
+        mainActivityBackButton.setOnClickListener(this)
+        rightButton.setOnClickListener (this)
+        leftButton.setOnClickListener(this)
+        forwardButton.setOnClickListener(this)
+        backButton.setOnClickListener(this)
+        connectionButton.setOnClickListener (this)
+    }
+
+
+    fun checkForPreviousState(){
+        if(BleService.stateClassObject != null) {
+
+            if (BleService.stateClassObject?.isAutoModeOn!!) {
+                autoToggle.setOnCheckedChangeListener(null)
+                autoToggle.isChecked = true
+                autoToggle.setOnCheckedChangeListener(this@MainActivity)
+                autoModeActive  =  true
+                setUiForAutoMode()
+            }
+
+
+            if (BleService.stateClassObject?.isUvOn!!) {
+                uvSwitch.setOnCheckedChangeListener(null)
+                uvSwitch.isChecked = true
+                uvSwitch.setOnCheckedChangeListener(this@MainActivity)
+                isUvOn  = true
+            }
+
+            setCountdownProgress(millis.toDouble())
+        }
+        else{
+            setUiForManualMode()
+        }
+    }
 }
+
