@@ -65,15 +65,14 @@ class ScanActivity : AppCompatActivity(), BluetoothListAdapter.OnDeviceSelectedL
             adapter.notifyDataSetChanged()
 
             if(!isScanning) {
-
                 bluetoothScanner?.startScan(scanCallback)
                 isScanning = true
-
-                handler.postDelayed({ bluetoothScanner?.stopScan(scanCallback)
-
-                scanProgressBar.visibility = View.INVISIBLE
-                }, 1000)
                 scanProgressBar.visibility = View.VISIBLE
+                handler.postDelayed({
+                    bluetoothScanner?.stopScan(scanCallback)
+                    scanProgressBar.visibility = View.INVISIBLE
+                }, 3000)
+
             }
             else
             {
@@ -124,7 +123,7 @@ class ScanActivity : AppCompatActivity(), BluetoothListAdapter.OnDeviceSelectedL
             bluetoothScanner?.stopScan(scanCallback)
             scanProgressBar.visibility = View.INVISIBLE
             isScanning  = false
-        } },1000)
+        } },3000)
 
         scanProgressBar.visibility = View.VISIBLE
 

@@ -137,15 +137,17 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
    private fun initialize() {
        //  bleService?.getActivityStateManagementObject()
 
-
        countdownCounter = Singleton.countdownCounter
-
-
-
 
        makeDialogs()
 
        rootLayout.setBackgroundResource(R.drawable.gradient)
+
+       if(!isDeviceConnected) {
+           overlay.visibility = View.VISIBLE
+       }
+
+
 
        leftButton.setOnTouchListener(this)
        rightButton.setOnTouchListener(this)
@@ -348,6 +350,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
             connectionButton.setImageResource(R.drawable.connected_button)
             bluetoothIndicator.setImageResource(R.drawable.bluetooth_indicator)
             deviceStatus.text  =  "Device connected"
+            overlay.visibility =  View.INVISIBLE
         }
 
     }
@@ -357,6 +360,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
         runOnUiThread{connectionButton.setImageResource(R.drawable.disconnect_button)
             bluetoothIndicator.setImageResource(R.drawable.bluetooth_disconnected)
             deviceStatus.text = "Device disconnected"
+            overlay.visibility =  View.INVISIBLE
         }
 
     }
