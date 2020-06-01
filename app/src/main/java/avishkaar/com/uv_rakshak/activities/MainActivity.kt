@@ -364,6 +364,14 @@ class MainActivity :
 
     }
 
+    override fun deviceCharging() {
+        setUiForChargingMode()
+    }
+
+    override fun deviceUnplugged() {
+        setUiForManualMode()
+    }
+
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) hideSystemUI()
@@ -564,6 +572,12 @@ class MainActivity :
         else{
             setUiForManualMode()
         }
+    }
+
+
+    private fun setUiForChargingMode(){
+        buttonHolder.visibility =  View.GONE
+        chargingTextView.visibility  =  View.VISIBLE
     }
 }
 

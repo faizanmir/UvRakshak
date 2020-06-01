@@ -56,6 +56,8 @@ class BleService : Service(), BluetoothHelper.BluetoothCallbacks
         fun startManualMode()
         fun onDeviceConnected()
         fun onDeviceDisconnected()
+        fun deviceCharging()
+        fun deviceUnplugged()
     }
 
 
@@ -307,6 +309,14 @@ class BleService : Service(), BluetoothHelper.BluetoothCallbacks
     override fun startManualMode() {
         bluetoothHelper?.startManualMode()
         mListener?.startManualMode()
+    }
+
+    override fun deviceCharging() {
+        mListener?.deviceCharging()
+    }
+
+    override fun deviceUnplugged() {
+        TODO("Not yet implemented")
     }
 
     override fun onTick(millisInFuture: Long) {

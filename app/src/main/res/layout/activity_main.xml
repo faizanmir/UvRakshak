@@ -14,6 +14,7 @@
         android:background="#99000000"
         android:elevation="30dp"
         android:id="@+id/overlay"
+        android:visibility="gone"
         >
 
         <ProgressBar
@@ -184,14 +185,28 @@
 
 
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="50dp"
+
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone"
+            android:id="@+id/chargingTextView"
+            android:text="@string/mobility_controls_have_been_disabled_as_the_device_is_charging"
+            />
 
     <androidx.cardview.widget.CardView
         android:layout_width="250dp"
         android:layout_height="250dp"
         app:cardCornerRadius="120dp"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="50dp"
         android:elevation="10dp"
         android:id="@+id/buttonHolder"
         >
@@ -229,6 +244,11 @@
             android:layout_gravity="center_vertical|end"
             />
     </androidx.cardview.widget.CardView>
+    </RelativeLayout>
+
+
+
+
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -255,8 +275,6 @@
             />
 
     </androidx.cardview.widget.CardView>
-
-
 
 
 

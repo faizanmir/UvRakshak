@@ -11,6 +11,7 @@ import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus
 import java.sql.Time
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.locks.Condition
 
 class BluetoothHelper(var context :Context) :
     BluetoothService.OnBluetoothEventCallback,
@@ -38,6 +39,12 @@ class BluetoothHelper(var context :Context) :
 
         countDownTimer.registerOnTimerStartedListener(Constants.BLUETOOTH_HELPER,this)
     }
+
+
+
+
+
+
     override fun onDataRead(buffer: ByteArray?, length: Int) {
         val strBuffer =  StringBuffer()
         for(byte in buffer!!)
@@ -45,11 +52,22 @@ class BluetoothHelper(var context :Context) :
             strBuffer.append(byte.toChar())
         }
 
-        if(strBuffer.toString().toInt() <= 20) {
+        if(strBuffer.toString().removeSurrounding("*").toInt() <= 20) {
             mListener?.broadcastUpdate(Constants.BATTERY_DRAINED)
+        }else if(strBuffer.toString() ==  "*charging")
+        {
+            mListener?.broadcastUpdate(Constants.DEVICE_CHARGING)
+        }else if(strBuffer.toString() == "*unplugged")
+        {
+            mListener?.broadcastUpdate(Constants.DEVICE_UNPLUGGED)
         }
 
+
     }
+
+
+
+
 
     override fun onStatusChange(status: BluetoothStatus?) {
         if (status == BluetoothStatus.CONNECTED)
@@ -62,6 +80,8 @@ class BluetoothHelper(var context :Context) :
 
     }
 
+
+
     override fun onDataWrite(buffer: ByteArray?) {
         val builder  =  StringBuilder()
         for (byte  in buffer!!)
@@ -69,7 +89,13 @@ class BluetoothHelper(var context :Context) :
             builder.append(byte.toChar())
         }
         Log.e("Written data...",builder.toString())
+
+
+
         builder.clear()
+
+
+
 
     }
 

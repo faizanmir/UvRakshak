@@ -13,4 +13,8 @@
         \n\n\nIn AUTO mode you will not be able to move the bot around </string>
     <string name="device_connected">Device connected</string>
     <string name="device_disconnected">Device disconnected</string>
+    <string name="mobility_controls_have_been_disabled_as_the_device_is_charging">
+        Mobility controls have been disabled while the device is charging
+        \nUnplug the bot to resume mobility
+    </string>
 </resources>

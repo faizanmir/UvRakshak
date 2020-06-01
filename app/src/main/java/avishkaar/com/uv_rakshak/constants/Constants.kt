@@ -3,6 +3,8 @@ package avishkaar.com.uv_rakshak.constants
 class Constants {
     companion object{
 
+        const val DEVICE_UNPLUGGED: String =  "avishkaar,com.uv_rakshak.DEVICE_UNPLUGGED"
+        const val DEVICE_CHARGING: String  = "avishkaar,com.uv_rakshak.DEVICE_CHARGING"
         const val DEVICE_DISCONNECTED: String = "avishkaar.com.uv_rakshak.DEVICE_DISCONNECTED"
         const val ACTION_GATT_CONNECTED = "avishkaar.com.uv_rakshak.ACTION_GATT_CONNECTED"
         const val ACTION_GATT_DISCONNECTED = "avishkaar.com.uv_rakshak.ACTION_GATT_DISCONNECTED"

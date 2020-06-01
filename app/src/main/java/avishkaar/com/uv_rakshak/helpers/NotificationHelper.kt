@@ -13,8 +13,11 @@ import androidx.core.app.NotificationManagerCompat
 import avishkaar.com.uv_rakshak.activities.MainActivity
 import avishkaar.com.uv_rakshak.receivers.NotificationBroadcastReceiver
 import avishkaar.com.uv_rakshak.R
+import avishkaar.com.uv_rakshak.constants.Constants
 import avishkaar.com.uv_rakshak.constants.Constants.Companion.BATTERY_DRAINED
+import avishkaar.com.uv_rakshak.constants.Constants.Companion.DEVICE_CHARGING
 import avishkaar.com.uv_rakshak.constants.Constants.Companion.DEVICE_CONNECTED
+import avishkaar.com.uv_rakshak.constants.Constants.Companion.DEVICE_UNPLUGGED
 import avishkaar.com.uv_rakshak.constants.Constants.Companion.DISINFECTION_COMPLETE
 import avishkaar.com.uv_rakshak.constants.Constants.Companion.DISINFECTION_IN_PROGRESS
 import avishkaar.com.uv_rakshak.constants.Constants.Companion.LOW_RSSI
@@ -45,7 +48,7 @@ class NotificationHelper(var context: Context) :
 
     interface OnNotificationChangeListener{
         fun onDone()
-        fun startAutoMode()//change name of this function
+        fun startAutoMode()
         fun shutdownService()
         fun disconnect()
         fun onDeviceOutOfRange()
@@ -56,11 +59,8 @@ class NotificationHelper(var context: Context) :
         fun onDisnfectionInProgress()
         fun stopDisinfection()
         fun startManualMode()
-
-        //change name of this function
-
-
-
+        fun deviceCharging()
+        fun deviceUnplugged()
     }
 
 
@@ -285,7 +285,7 @@ class NotificationHelper(var context: Context) :
                         supportsAction = true,
                         hasProgressBar = false,
                         descriptionTextForAction = "Start Disinfection",
-                        identifier = DEVICE_CONNECTED,
+                        identifier = action,
                         icon = R.drawable.ic_android_black_24dp)
                 )
 
@@ -297,7 +297,7 @@ class NotificationHelper(var context: Context) :
                         supportsAction = true,
                         hasProgressBar = true,
                         descriptionTextForAction = "Stop Disinfection",
-                        identifier = DISINFECTION_IN_PROGRESS,
+                        identifier = action,
                         icon = R.drawable.ic_android_black_24dp)
                 )
                 mListener?.onDisnfectionInProgress()
@@ -309,7 +309,7 @@ class NotificationHelper(var context: Context) :
                         supportsAction = true,
                         hasProgressBar = false,
                         descriptionTextForAction = "Disconnect from device",
-                        identifier = DISINFECTION_COMPLETE,
+                        identifier = action,
                         icon = R.drawable.ic_android_black_24dp)
                 )
                 mListener?.onDisinfectionComplete()
@@ -321,7 +321,7 @@ class NotificationHelper(var context: Context) :
                         supportsAction = true,
                         hasProgressBar = false,
                         descriptionTextForAction = "Switch to Auto mode",
-                        identifier = LOW_RSSI,
+                        identifier = action,
                         icon = R.drawable.ic_android_black_24dp)
                 )
                 mListener?.onDeviceRSSIlow()
@@ -333,7 +333,7 @@ class NotificationHelper(var context: Context) :
                         supportsAction = true,
                         hasProgressBar = false,
                         descriptionTextForAction = "Switch to Auto mode",
-                        identifier = OUT_OF_RANGE,
+                        identifier = action,
                         icon = R.drawable.ic_android_black_24dp)
                 )
                 mListener?.onDeviceOutOfRange()
@@ -347,7 +347,7 @@ class NotificationHelper(var context: Context) :
                         supportsAction = false,
                         hasProgressBar = false,
                         descriptionTextForAction = null,
-                        identifier =BATTERY_DRAINED,
+                        identifier =action,
                         icon = R.drawable.ic_android_black_24dp)
                 )
                 mListener?.onBatteryLow()
@@ -360,7 +360,7 @@ class NotificationHelper(var context: Context) :
                         supportsAction = true,
                         hasProgressBar = false,
                         descriptionTextForAction = "Ok",
-                        identifier = STOP_DISINFECTION,
+                        identifier = action,
                         icon = R.drawable.ic_android_black_24dp)
                 )
                 mListener?.stopDisinfection()
@@ -388,7 +388,7 @@ class NotificationHelper(var context: Context) :
                         supportsAction = false,
                         hasProgressBar = false,
                         descriptionTextForAction = "Ok",
-                        identifier = ON_DONE,
+                        identifier = action,
                         icon = R.drawable.ic_android_black_24dp)
                     //kill service here
 
@@ -403,6 +403,33 @@ class NotificationHelper(var context: Context) :
             }
 
 
+            DEVICE_CHARGING ->{
+                showNotification(notificationBuilder(
+                    title = "Battery charging",
+                    contentText = "Device is charging",
+                    supportsAction = false,
+                    identifier = action,
+                    icon = R.drawable.ic_android_black_24dp,
+                    hasProgressBar = false,
+                    descriptionTextForAction = null
+                ))
+                mListener?.deviceCharging()
+
+            }
+
+            DEVICE_UNPLUGGED->{
+                showNotification(notificationBuilder(
+                    title = "Device Unplugged",
+                    contentText = "Device is unplugged",
+                    supportsAction = false,
+                    identifier = action,
+                    icon = R.drawable.ic_android_black_24dp,
+                    hasProgressBar = false,
+                    descriptionTextForAction = null
+                ))
+                mListener?.deviceUnplugged()
+            }
+
         }
     }
 
@@ -411,7 +438,7 @@ class NotificationHelper(var context: Context) :
     }
 
 
-    fun getProgress():Int{
+    private fun getProgress():Int{
         return  countdownProgress
     }
 
