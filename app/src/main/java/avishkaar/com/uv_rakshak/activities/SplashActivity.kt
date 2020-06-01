@@ -37,15 +37,15 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
 
 
-
-
-        if(BleService.Companion.BluetoothInitializerClass.service?.status  == BluetoothStatus.CONNECTED)
-        {
-            startActivity(Intent(this,MainActivity::class.java))
-        }else
-        {
-            BleService.Companion.BluetoothInitializerClass(applicationContext).setService()
+        if(BleService.Companion.BluetoothInitializerClass.service !=  null) {
+            if (BleService.Companion.BluetoothInitializerClass.service?.status == BluetoothStatus.CONNECTED) {
+                startActivity(Intent(this, MainActivity::class.java))
+            }
         }
+        else {
+                BleService.Companion.BluetoothInitializerClass(applicationContext).setService()
+            }
+
     }
 
     fun proceedToScan(view: View) {

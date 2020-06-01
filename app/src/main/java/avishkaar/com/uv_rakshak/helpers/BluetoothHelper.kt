@@ -11,6 +11,7 @@ import avishkaar.com.uv_rakshak.singletons.Singleton
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothWriter
+import java.lang.StringBuilder
 
 class BluetoothHelper(var context :Context) :BluetoothService.OnBluetoothEventCallback,BluetoothService.OnBluetoothScanCallback{
     interface BluetoothCallbacks{
@@ -41,6 +42,13 @@ class BluetoothHelper(var context :Context) :BluetoothService.OnBluetoothEventCa
     }
 
     override fun onDataWrite(buffer: ByteArray?) {
+        var builder  =  StringBuilder()
+        for (byte  in buffer!!)
+        {
+            builder.append(byte.toChar())
+        }
+        Log.e("Written data...",builder.toString())
+        builder.clear()
 
     }
 
@@ -114,7 +122,7 @@ class BluetoothHelper(var context :Context) :BluetoothService.OnBluetoothEventCa
 
     fun write(instruction: String) {
         Log.e("Tag",instruction)
-        writer?.write(instruction)
+        writer?.write("$instruction#")
     }
 
     fun connect(bluetoothDevice: BluetoothDevice?) {

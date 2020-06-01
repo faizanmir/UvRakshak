@@ -61,8 +61,6 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
         makeDialogs()
         setGestureListeners()
         checkForPreviousState()
-
-
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
@@ -338,11 +336,6 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
         }
 
     }
-
-
-
-
-
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)

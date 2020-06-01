@@ -78,7 +78,7 @@ class BleService : Service(), BluetoothHelper.BluetoothCallbacks
                 config.bluetoothServiceClass =
                     BluetoothLeService::class.java // BluetoothClassicService.class or BluetoothLeService.class
                 config.bufferSize = 1024
-                config.characterDelimiter = ' '
+                config.characterDelimiter =' '
                 config.deviceName = "Bluetooth"
                 config.callListenersInMainThread = true
                 config.uuidService =
@@ -221,11 +221,6 @@ class BleService : Service(), BluetoothHelper.BluetoothCallbacks
 
 
 
-//    fun connectToDevice(address:String?)
-//    {
-//        bluetoothHelper?.connect(address)
-//    }
-
 
     fun write(instruction:String)
     {
@@ -242,7 +237,7 @@ class BleService : Service(), BluetoothHelper.BluetoothCallbacks
             Handler().postDelayed({
                 stopForeground(true)
                 stopSelf()
-            },3000)
+            },1000)
 
         }else{
             stopSelf()
