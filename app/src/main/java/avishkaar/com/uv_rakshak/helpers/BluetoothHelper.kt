@@ -3,27 +3,51 @@ package avishkaar.com.uv_rakshak.helpers
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.util.Log
-import avishkaar.com.uv_rakshak.activities.MainActivity
+import android.util.TimeUtils
 import avishkaar.com.uv_rakshak.constants.Constants
 import avishkaar.com.uv_rakshak.services.BleService
 import avishkaar.com.uv_rakshak.services.BleService.Companion.BluetoothInitializerClass.Companion.writer
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus
+import java.sql.Time
+import java.util.concurrent.TimeUnit
 
-class BluetoothHelper(var context :Context) :BluetoothService.OnBluetoothEventCallback,BluetoothService.OnBluetoothScanCallback{
+class BluetoothHelper(var context :Context) :
+    BluetoothService.OnBluetoothEventCallback,
+    BluetoothService.OnBluetoothScanCallback,
+    CountdownCounter.OnTimerStartedListener{
+
     interface BluetoothCallbacks{
         fun broadcastUpdate(action:String)
         fun onBluetoothStateChange(newState:BluetoothStatus?)
     }
     private var mListener: BluetoothCallbacks?=  null
 
+    private  var countDownTimer:CountdownCounter  =  CountdownCounter(5*60*1000,1000)
 
-    val service:BluetoothService ? =  BleService.Companion.BluetoothInitializerClass.service
+    private val service:BluetoothService ? =  BleService.Companion.BluetoothInitializerClass.service
     init {
-        mListener = context as BluetoothCallbacks
+        countDownTimer.start()
+        try {
+            mListener = context as BluetoothCallbacks
+        }catch (e:Exception)
+        {
+            e.printStackTrace()
+        }
+
+
+        countDownTimer.registerOnTimerStartedListener(Constants.BLUETOOTH_HELPER,this)
     }
     override fun onDataRead(buffer: ByteArray?, length: Int) {
+        val strBuffer =  StringBuffer()
+        for(byte in buffer!!)
+        {
+            strBuffer.append(byte.toChar())
+        }
 
+        if(strBuffer.toString().toInt() <= 20) {
+            mListener?.broadcastUpdate(Constants.BATTERY_DRAINED)
+        }
 
     }
 
@@ -39,7 +63,7 @@ class BluetoothHelper(var context :Context) :BluetoothService.OnBluetoothEventCa
     }
 
     override fun onDataWrite(buffer: ByteArray?) {
-        var builder  =  StringBuilder()
+        val builder  =  StringBuilder()
         for (byte  in buffer!!)
         {
             builder.append(byte.toChar())
@@ -67,9 +91,8 @@ class BluetoothHelper(var context :Context) :BluetoothService.OnBluetoothEventCa
 
     fun startAutoMode() {
         Log.i("TAG","startAutoMode")
-        if(!MainActivity.ACTIVITY_IS_RUNNING ) {
-            write("*amode")
-        }
+        write("*amode")
+
     }
 
     fun shutdownService() {
@@ -91,11 +114,12 @@ class BluetoothHelper(var context :Context) :BluetoothService.OnBluetoothEventCa
 
     fun onDisinfectionComplete() {
         Log.i("TAG","on disinfection complete")
-        write("*uvoff")
+        write("*finished")
     }
 
     fun onBatteryLow() {
         Log.i("TAG","onBattery low")
+
     }
 
     fun onDeviceRSSIlow() {
@@ -138,5 +162,17 @@ class BluetoothHelper(var context :Context) :BluetoothService.OnBluetoothEventCa
 
     override fun onDeviceDiscovered(device: BluetoothDevice?, rssi: Int) {
 
+    }
+
+    override fun onTick(millisInFuture: Long) {
+        Log.e("Thread",Thread.currentThread().name)
+        Log.e("bluetooth counter",TimeUnit.MILLISECONDS.toMinutes(millisInFuture.toLong()).toString())
+    }
+
+    override fun onFinish() {
+       if(service?.status  ==  BluetoothStatus.CONNECTED) {
+           write("*bat")
+       }
+        countDownTimer.start()
     }
 }

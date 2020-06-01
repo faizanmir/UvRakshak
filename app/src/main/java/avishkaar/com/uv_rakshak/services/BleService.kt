@@ -353,9 +353,11 @@ class BleService : Service(), BluetoothHelper.BluetoothCallbacks
 
     fun connect(device:BluetoothDevice?)
     {
-        Log.e("TAG","Called connnect")
+        Log.e("TAG","Called connect")
         Log.e("Device", device.toString())
+
         bluetoothHelper!!.connect(device)
+
     }
 
 

@@ -11,4 +11,6 @@
         In Auto mode, the bot will continue to disinfect based on the time at the timer
         \n\n\nThe motion sensors will be turned on and the bot will automatically shutdown if it detects human presence
         \n\n\nIn AUTO mode you will not be able to move the bot around </string>
+    <string name="device_connected">Device connected</string>
+    <string name="device_disconnected">Device disconnected</string>
 </resources>

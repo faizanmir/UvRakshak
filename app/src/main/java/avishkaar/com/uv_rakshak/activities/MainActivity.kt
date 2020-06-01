@@ -27,10 +27,13 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.util.concurrent.TimeUnit
 
 
-class MainActivity : AppCompatActivity(), ServiceConnection,
+class MainActivity :
+    AppCompatActivity(),
+    ServiceConnection,
     CountdownCounter.OnTimerStartedListener,
     CompoundButton.OnCheckedChangeListener,
-    View.OnTouchListener, View.OnClickListener,
+    View.OnTouchListener,
+    View.OnClickListener,
     BleService.ServiceActionListener {
     private var bleService: BleService? = null
     private var countdownCounter: CountdownCounter? = null
@@ -58,6 +61,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         initialize()
         makeDialogs()
         setGestureListeners()
@@ -89,7 +93,6 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
     }
 
     private fun bindService(intent:Intent){
-        Log.e("bindService","Attempting connection")
         bindService(intent,this, 0)
     }
 
@@ -173,7 +176,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
     }
 
 
-    fun setUiForManualMode() {
+    private fun setUiForManualMode() {
         timeProgressbar.visibility = View.VISIBLE
         buttonHolder.visibility = View.VISIBLE
         timeTextView.text = getString(R.string.timer_will_begin)
@@ -343,7 +346,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
         runOnUiThread {
             connectionButton.setImageResource(R.drawable.connected_button)
             bluetoothIndicator.setImageResource(R.drawable.bluetooth_indicator)
-            deviceStatus.text  =  "Device connected"
+            deviceStatus.text  =  getString(R.string.device_connected)
             overlay.visibility =  View.INVISIBLE
             rootLayout.setBackgroundResource(R.drawable.gradient)
         }
@@ -354,7 +357,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
         isDeviceConnected  =  false
         runOnUiThread{connectionButton.setImageResource(R.drawable.disconnect_button)
             bluetoothIndicator.setImageResource(R.drawable.bluetooth_disconnected)
-            deviceStatus.text = "Device disconnected"
+            deviceStatus.text = getString(R.string.device_disconnected)
             overlay.visibility =  View.INVISIBLE
             rootLayout.setBackgroundColor(Color.parseColor("#dfdfdf"))
         }
@@ -440,6 +443,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
 
             }, {
                 if (!autoModeActive) {
+                    bleService?.startAutoMode()
                     autoToggle.performClick()
                 }
 
@@ -457,6 +461,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
                 if(isDeviceConnected)
                 {
                     service?.disconnect()
+                    bleService?.setNotification(Constants.ON_DONE)
                   //  bleService?.setActivityStateManagementVariables(null)
                 }else{
                     overlay.visibility = View.VISIBLE
@@ -489,23 +494,23 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
 
 
 
-    fun setActivityState(isUvOn:Boolean,isAutoOn:Boolean){
+    private fun setActivityState(isUvOn:Boolean, isAutoOn:Boolean){
         bleService?.setActivityStateManagementVariables(ActivityStateClass(isUvOn,isAutoOn,millis))
     }
 
 
 
-    fun setUiForConnected(){
+    private fun setUiForConnected(){
         Log.e("TAG","Device already connected")
         isDeviceConnected  =  true
         overlay.visibility  = View.GONE
         bluetoothIndicator.setImageResource(R.drawable.bluetooth_indicator)
-        deviceStatus.text  =  "Device Connected"
+        deviceStatus.text  =  getString(R.string.device_connected)
         connectionButton.setImageResource(R.drawable.connected_button)
     }
 
 
-    fun setTimerProgress(millis:Long){
+    private fun setTimerProgress(millis:Long){
         timeTextView?.text = String.format(
             "%02d:%02d  Minutes Left",
             TimeUnit.MILLISECONDS.toMinutes(millis).toInt(),
@@ -517,7 +522,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
 
 
 
-    fun setGestureListeners()
+    private fun setGestureListeners()
     {
 
         leftButton.setOnTouchListener(this)
@@ -535,7 +540,7 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
     }
 
 
-    fun checkForPreviousState(){
+    private fun checkForPreviousState(){
         if(BleService.stateClassObject != null) {
 
             if (BleService.stateClassObject?.isAutoModeOn!!) {

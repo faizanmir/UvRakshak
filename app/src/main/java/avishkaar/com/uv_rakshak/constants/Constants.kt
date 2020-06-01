@@ -31,6 +31,7 @@ class Constants {
         const val ACTIVITY_ID  =  "avishkaar.com.uv_rakhshak_mainActivity"
         const val SERVICE_ID = "avishkaar.com.uv_rakhshak_bleService"
         const val SWITCH_TO_MANUAL_MODE  =  "avishkaar.com.uv_rakshak.SWITCH_TO_MANUAL_MODE"
+        const val BLUETOOTH_HELPER  =  "avishkaar.com.uv_rakshak.BLUETOOTH_HELPER"
     }
 
 
