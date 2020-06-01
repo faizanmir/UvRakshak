@@ -9,7 +9,7 @@ class CountdownCounter(var millisInFuture: Long, var countDownInterval: Long) :C
 
     interface OnTimerStartedListener{
         fun onTick(millisInFuture: Long)
-        fun onFinish();
+        fun onFinish()
     }
 
     var listenerMap  =  hashMapOf<String ,OnTimerStartedListener?>()

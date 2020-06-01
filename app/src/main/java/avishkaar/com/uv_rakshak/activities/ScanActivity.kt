@@ -41,8 +41,6 @@ class ScanActivity : AppCompatActivity(), BluetoothListAdapter.OnDeviceSelectedL
 
     override fun onDeviceSelected(bluetoothDevice: BluetoothDevice?) {
         selectedDevice  =  bluetoothDevice
-
-
     }
 
     private fun init()
@@ -51,7 +49,9 @@ class ScanActivity : AppCompatActivity(), BluetoothListAdapter.OnDeviceSelectedL
         service  = BleService.Companion.BluetoothInitializerClass.service
         service?.setOnScanCallback(this)
         service?.setOnEventCallback(this)
+
         service?.startScan()
+
         adapter = BluetoothListAdapter(scanResult,this)
 
         bluetoothRecyclerView.adapter = adapter

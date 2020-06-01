@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.CompoundButton
+import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -237,9 +238,32 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
                 }
 
 
+
+
             }
         } else if (event?.action == MotionEvent.ACTION_UP) {
             bleService?.write("*x")
+            when(v?.id)
+            {
+
+                R.id.forwardButton -> {
+
+                    (v as ImageView).setImageResource(R.drawable.fwd_button)
+                }
+                R.id.leftButton -> {
+
+                    (v as ImageView).setImageResource(R.drawable.left_button)
+                }
+                R.id.rightButton -> {
+
+                    (v as ImageView).setImageResource(R.drawable.right_button)
+                }
+                R.id.backButton -> {
+
+                    (v as ImageView).setImageResource(R.drawable.back_button)
+                }
+
+            }
         }
         return true
     }
@@ -445,16 +469,21 @@ class MainActivity : AppCompatActivity(), ServiceConnection,
             }
             R.id.forwardButton -> {
                 bleService?.write("*f")
+                (v as ImageView).setImageResource(R.drawable.fwd_button_pressed)
             }
             R.id.leftButton -> {
                 bleService?.write("*l")
+                (v as ImageView).setImageResource(R.drawable.left_button_pressed)
             }
             R.id.rightButton -> {
                 bleService?.write("*r")
+                (v as ImageView).setImageResource(R.drawable.right_button_pressed)
             }
             R.id.backButton -> {
                 bleService?.write("*b")
+                (v as ImageView).setImageResource(R.drawable.back_button_pressed)
             }
+
         }
     }
 

@@ -2,16 +2,13 @@ package avishkaar.com.uv_rakshak.helpers
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
-import android.provider.SyncStateContract
 import android.util.Log
+import avishkaar.com.uv_rakshak.activities.MainActivity
 import avishkaar.com.uv_rakshak.constants.Constants
 import avishkaar.com.uv_rakshak.services.BleService
 import avishkaar.com.uv_rakshak.services.BleService.Companion.BluetoothInitializerClass.Companion.writer
-import avishkaar.com.uv_rakshak.singletons.Singleton
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothService
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothStatus
-import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothWriter
-import java.lang.StringBuilder
 
 class BluetoothHelper(var context :Context) :BluetoothService.OnBluetoothEventCallback,BluetoothService.OnBluetoothScanCallback{
     interface BluetoothCallbacks{
@@ -70,7 +67,9 @@ class BluetoothHelper(var context :Context) :BluetoothService.OnBluetoothEventCa
 
     fun startAutoMode() {
         Log.i("TAG","startAutoMode")
-        write("*amode")
+        if(!MainActivity.ACTIVITY_IS_RUNNING ) {
+            write("*amode")
+        }
     }
 
     fun shutdownService() {

@@ -9,12 +9,14 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.util.Log
-import avishkaar.com.uv_rakshak.modelClasses.ActivityStateClass
-import avishkaar.com.uv_rakshak.receivers.NotificationBroadcastReceiver
 import avishkaar.com.uv_rakshak.R
 import avishkaar.com.uv_rakshak.constants.Constants
 import avishkaar.com.uv_rakshak.constants.Constants.Companion.LOW_RSSI
-import avishkaar.com.uv_rakshak.helpers.*
+import avishkaar.com.uv_rakshak.helpers.BluetoothHelper
+import avishkaar.com.uv_rakshak.helpers.CountdownCounter
+import avishkaar.com.uv_rakshak.helpers.NotificationHelper
+import avishkaar.com.uv_rakshak.modelClasses.ActivityStateClass
+import avishkaar.com.uv_rakshak.receivers.NotificationBroadcastReceiver
 import avishkaar.com.uv_rakshak.services.BleService.Companion.BluetoothInitializerClass.Companion.service
 import avishkaar.com.uv_rakshak.singletons.Singleton
 import com.github.douglasjunior.bluetoothclassiclibrary.BluetoothConfiguration
@@ -36,8 +38,7 @@ class BleService : Service(), BluetoothHelper.BluetoothCallbacks
     var binder: LocalBinder = LocalBinder()
     var countDownTimer:CountdownCounter?  =  null
     var mListener:ServiceActionListener? = null
-    var progress:Int  = 0;
-    var activityStateClass: ActivityStateClass? =  null
+    var progress:Int  = 0
 
 
     interface ServiceActionListener{
@@ -114,7 +115,6 @@ class BleService : Service(), BluetoothHelper.BluetoothCallbacks
 
 
     override fun onBind(intent: Intent): IBinder {
-        Log.e("OnBind","Registering callback to bluetooth helper")
         service?.setOnEventCallback(bluetoothHelper)
         return binder
     }
@@ -124,6 +124,9 @@ class BleService : Service(), BluetoothHelper.BluetoothCallbacks
 
         broadcastReceiver = Singleton.notificationBroadcastReceiver
         broadcastReceiver?.registerNotificationChangeListener(notificationHelper)
+
+
+
         notificationHelper?.createNotificationChannel(CHANNEL_ID, CHANNEL_NAME)
         registerReceiver(broadcastReceiver, NotificationBroadcastReceiver.makeIntentFilter())
 
@@ -315,11 +318,6 @@ class BleService : Service(), BluetoothHelper.BluetoothCallbacks
         this@BleService .setNotification(Constants.DISINFECTION_COMPLETE)
     }
 
-
-    fun handleDeviceDisconnection()
-    {
-        bluetoothHelper?.disconnect()
-    }
 
 
 

@@ -31,7 +31,7 @@ class NotificationHelper(var context: Context) :
 
     var mListener:OnNotificationChangeListener? =  null
 
-    var countdownProgress :Int =  0;
+    var countdownProgress :Int =  0
 
     init {
         try {
